@@ -10,8 +10,8 @@ st.set_page_config(page_title="Conversational Data Agent", layout="wide")
 st.title("📊 Conversational Data Agent & Analytics Dashboard")
 
 # 2. Configure Gemini API
-genai.configure(api_key="YOUR_GEMINI_API_KEY")
-model = genai.GenerativeModel('gemini-3.5-flash')
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 # 3. File Uploader in Sidebar
 uploaded_file = st.sidebar.file_uploader("Upload your CSV file", type=["csv"])
@@ -132,31 +132,18 @@ Write executable Python code to fulfill the user's request.
                     st.session_state.messages.append({
                         "role": "assistant", 
                         "content": img_bytes, 
-                        "type": "image",
+                        "type": "image", 
                         "text": "Here is your visualization!"
                     })
                     plt.close(fig) # Prevent memory leaks
 
                 elif "result" in local_vars:
                     result = local_vars["result"]
-                    if isinstance(result, (pd.DataFrame, pd.Series)):
-                        st.dataframe(result)
-                        st.session_state.messages.append({
-                            "role": "assistant", 
-                            "content": f"Result:\n\n{result.to_markdown()}", 
-                            "type": "text"
-                        })
-                    else:
-                        st.write(result)
-                        st.session_state.messages.append({
-                            "role": "assistant", 
-                            "content": f"Result: {result}", 
-                            "type": "text"
-                        })
-                else:
-                    msg = "Code executed successfully, but no `fig` or `result` variable was created."
-                    st.warning(msg)
-                    st.session_state.messages.append({"role": "assistant", "content": msg, "type": "text"})
-
+                    st.markdown(str(result))
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": str(result),
+                        "type": "text"
+                    })
             except Exception as e:
                 st.error(f"Error during analysis: {e}")
